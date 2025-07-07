@@ -11,16 +11,51 @@ import { Separator } from 'src/ui/separator';
 import {
 	backgroundColors,
 	contentWidthArr,
+	defaultArticleState,
 	fontColors,
 	fontFamilyOptions,
 	fontSizeOptions,
 } from 'src/constants/articleProps';
 
-export const ArticleParamsForm = () => {
+export const ArticleParamsForm = ({
+	onApply,
+}: {
+	onApply: (settings: typeof defaultArticleState) => void;
+}) => {
+	const [fontFamily, setFontFamily] = useState(
+		defaultArticleState.fontFamilyOption
+	);
+	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
+	const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
+	const [backgroundColor, setBackgroundColor] = useState(
+		defaultArticleState.backgroundColor
+	);
+	const [contentWidth, setContentWidth] = useState(
+		defaultArticleState.contentWidth
+	);
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
 
 	const handleArrowClick = () => {
 		setIsPanelOpen(!isPanelOpen);
+	};
+
+	const handleApplyClick = () => {
+		const applyStates = {
+			fontFamilyOption: fontFamily,
+			fontSizeOption: fontSize,
+			fontColor: fontColor,
+			backgroundColor: backgroundColor,
+			contentWidth: contentWidth,
+		};
+		onApply(applyStates);
+	};
+
+	const handleResetClick = () => {
+		setFontFamily(defaultArticleState.fontFamilyOption);
+		setFontSize(defaultArticleState.fontSizeOption);
+		setFontColor(defaultArticleState.fontColor);
+		setBackgroundColor(defaultArticleState.backgroundColor);
+		setContentWidth(defaultArticleState.contentWidth);
 	};
 
 	return (
@@ -30,32 +65,55 @@ export const ArticleParamsForm = () => {
 				className={clsx(styles.container, {
 					[styles.container_open]: isPanelOpen,
 				})}>
-				<form className={styles.form}>
+				<form className={styles.form} onSubmit={(e) => e.preventDefault()}>
 					<Text uppercase={true} size={31} weight={800}>
 						задайте параметры
 					</Text>
-					<Select title='шрифт' selected={null} options={fontFamilyOptions} />
+					<Select
+						title='шрифт'
+						selected={fontFamily}
+						options={fontFamilyOptions}
+						onChange={setFontFamily}
+					/>
 					<RadioGroup
 						title='размер шрифта'
 						options={fontSizeOptions}
-						name=''
-						selected={fontSizeOptions[0]}
+						name='размер шрифта'
+						selected={fontSize}
+						onChange={setFontSize}
 					/>
-					<Select title='цвет шрифта' selected={null} options={fontColors} />
+					<Select
+						title='цвет шрифта'
+						selected={fontColor}
+						options={fontColors}
+						onChange={setFontColor}
+					/>
 					<Separator />
 					<Select
 						title='цвет фона'
-						selected={null}
+						selected={backgroundColor}
 						options={backgroundColors}
+						onChange={setBackgroundColor}
 					/>
 					<Select
 						title='ширина контента'
-						selected={null}
+						selected={contentWidth}
 						options={contentWidthArr}
+						onChange={setContentWidth}
 					/>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' />
-						<Button title='Применить' htmlType='submit' type='apply' />
+						<Button
+							title='Сбросить'
+							htmlType='reset'
+							type='clear'
+							onClick={handleResetClick}
+						/>
+						<Button
+							title='Применить'
+							htmlType='button'
+							type='apply'
+							onClick={handleApplyClick}
+						/>
 					</div>
 				</form>
 			</aside>
