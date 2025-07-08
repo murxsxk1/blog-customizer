@@ -2,7 +2,7 @@ import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 
 import styles from './ArticleParamsForm.module.scss';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Select } from 'src/ui/select';
@@ -35,6 +35,8 @@ export const ArticleParamsForm = ({
 	);
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
 
+	const containerRef = useRef<HTMLDivElement>(null);
+
 	const handleArrowClick = () => {
 		setIsPanelOpen(!isPanelOpen);
 	};
@@ -58,10 +60,45 @@ export const ArticleParamsForm = ({
 		setContentWidth(defaultArticleState.contentWidth);
 	};
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				isPanelOpen &&
+				containerRef.current &&
+				!containerRef.current.contains(event.target as Node)
+			) {
+				setIsPanelOpen(false);
+			}
+		};
+
+		if (isPanelOpen) {
+			document.addEventListener('mousedown', handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [isPanelOpen]);
+
+	useEffect(() => {
+		const handleClickEscape = (event: KeyboardEvent) => {
+			event.key === 'Escape' && setIsPanelOpen(false);
+		};
+
+		if (isPanelOpen) {
+			document.addEventListener('keydown', handleClickEscape);
+		}
+
+		return () => {
+			document.removeEventListener('keydown', handleClickEscape);
+		};
+	});
+
 	return (
 		<>
 			<ArrowButton isOpen={isPanelOpen} onClick={handleArrowClick} />
 			<aside
+				ref={containerRef}
 				className={clsx(styles.container, {
 					[styles.container_open]: isPanelOpen,
 				})}>
